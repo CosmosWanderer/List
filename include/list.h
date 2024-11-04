@@ -15,6 +15,78 @@ protected:
 public:
 
 
+	/* --- Итератор --- */
+	class Iterator {
+	public:
+		Node* curr = nullptr;
+
+		// Конструтор
+		Iterator(Node* nd)
+		{
+			curr = nd;
+		}
+
+		// Арифметические операции
+		Iterator& operator++()
+		{
+			if (!curr) throw out_of_range("Trying to acces data out of range");
+			curr = curr->next;
+			return *this;
+		}
+
+		Iterator operator++(int)
+		{
+			Iterator res = *this;
+			if (!curr) throw out_of_range("Trying to acces data out of range");
+			curr = curr->next;
+			return res;
+		}
+
+		Iterator operator+(int step)
+		{
+			Iterator res(curr);
+
+			for (int i = 0; i < step; i++) {
+				if (!res.curr) throw out_of_range("Trying to acces data out of range");
+				res.curr = res.curr->next;
+			}
+
+			return res;
+		}
+
+		Iterator& operator+=(int step) 
+		{
+			for (int i = 0; i < step; i++) {
+				if (!curr) throw out_of_range("Trying to acces data out of range");
+
+				curr = curr->next;
+			}
+
+			return *this;
+		}
+
+		// Сравнение
+		bool operator!=(const Iterator& it) 
+		{
+			return !(curr == it.curr);
+		}
+
+		bool operator==(const Iterator& it) 
+		{
+			return curr == it.curr;
+		}
+
+		// Разыменование
+		TELEM& operator*() 
+		{ 
+			if (!curr) throw out_of_range("Trying to acces data out of range");
+			return curr->value; 
+		}
+
+
+	};
+
+
 	/* --- Конструкторы и подобное --- */
 
 
@@ -33,17 +105,6 @@ public:
 			first = nullptr;
 		}
 		else {
-			/*
-			Node* curr1 = l.first;
-			Node* curr2 = new Node(curr1->value, nullptr);
-			first = curr2;
-			while (!curr1->next) {
-				Node* next1 = curr1->next;
-				curr2->next = new Node(next1->value, nullptr);
-				curr2 = curr2->next;
-				curr1 = curr1->next;
-			}
-			*/
 			Node* curr1 = l.first;
 			first = new Node(curr1->value, nullptr);
 			Node* curr2 = first;
@@ -78,7 +139,7 @@ public:
 			clear(first);
 			
 			// А дальше копия конструктора копирования
-			if (l->first != nullptr) {
+			if (l.first != nullptr) {
 				Node* curr1 = l.first;
 				Node* curr2 = new Node(curr1->value, nullptr);
 				first = curr2;
@@ -198,6 +259,15 @@ public:
 			curr = curr->next;
 		}
 		return curr;
+	}
+
+	// Получение итератора 
+	Iterator begin() {
+		return Iterator(first);
+	}
+
+	Iterator end() {
+		return Iterator(nullptr);
 	}
 };
 
